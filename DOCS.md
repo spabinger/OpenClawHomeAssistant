@@ -811,6 +811,18 @@ Go to **Settings → Add-ons → OpenClaw Assistant → Log** tab. Logs show sta
 3. Is the port correct? `openclaw config get gateway.port`
 4. Is the firewall blocking the port? Check your HA host firewall rules
 
+### Gateway restart loop: `web_search provider is not available: brave`
+
+**Symptom**: Logs repeat `Invalid config at /config/.openclaw/openclaw.json` and `tools.web.search.provider: web_search provider is not available: brave`.
+
+**Cause**: The persisted OpenClaw config selects the Brave web search provider, but that provider plugin is not currently installed or enabled in the add-on runtime.
+
+**Fix**: In v0.5.72+ the add-on clears that unavailable provider automatically during startup. On older versions, run this in the add-on terminal, then restart:
+
+```sh
+jq 'del(.tools.web.search.provider)' /config/.openclaw/openclaw.json > /tmp/openclaw.json && mv /tmp/openclaw.json /config/.openclaw/openclaw.json
+```
+
 ### "disconnected (1008): control ui requires device identity" / "requires HTTPS or localhost"
 
 **Symptom**: Gateway UI shows error 1008 or "requires secure context / device identity".
